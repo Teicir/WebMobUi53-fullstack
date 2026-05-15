@@ -7,6 +7,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PollVote extends Model
 {
+    // CHANGEMENT :
+    // Autorise la création automatique des votes avec PollVote::create([...]).
+    // Sans ça, Laravel bloque les champs par sécurité.
+    protected $fillable = [
+        'poll_id',
+        'user_id',
+        'poll_option_id',
+    ];
+
     /**
      * Get the poll that owns the vote.
      */

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\v1\ApiPostController;
 use App\Http\Controllers\Api\v1\ApiFooController;
 use App\Http\Controllers\Api\v1\ApiPollController;
+use App\Http\Controllers\Api\v1\ApiPollVoteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,4 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/v1/polls', [ApiPollController::class, 'store']);
     Route::patch('/v1/polls/{id}', [ApiPollController::class, 'update']);
     Route::delete('/v1/polls/{id}', [ApiPollController::class, 'remove']);
+    // CHANGEMENT :
+    // Route protégée pour voter à un sondage via son token.
+    // Le vote nécessite un utilisateur connecté.
+    Route::post('/v1/polls/{token}/votes', [ApiPollVoteController::class, 'store']);
 });
