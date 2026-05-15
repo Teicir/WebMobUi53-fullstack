@@ -13,9 +13,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     @isset($title)
-        <title>{{ $title }} - {{ config('app.name') }}</title>
+        <title>{{ $title }} - Sondages</title>
     @else
-        <title>{{ config('app.name') }}</title>
+        <title>Sondages</title>
     @endisset
 
     @vite(['resources/css/app.css'])
@@ -29,8 +29,11 @@
          Header commun responsive pour faciliter la navigation et les tests multi-utilisateurs. -->
     <header class="app-header">
         <nav class="app-nav">
+            <!-- CHANGEMENT :
+                 On remplace le nom de l'application de base par "Sondages"
+                 pour que le header corresponde au projet actuel. -->
             <a href="/" class="app-logo">
-                {{ config('app.name') }}
+                Sondages
             </a>
 
             <div class="app-nav-links">

@@ -1,77 +1,131 @@
-# HEIG-VD DévProdMéd Course - Mini-projet
+# Application de sondage - Laravel & Vue.js
 
-Ce dépôt contient le mini-projet à réaliser dans le cadre du cours
-_"[Développement de produit média (DévProdMéd)](https://github.com/heig-vd-devprodmed-course/heig-vd-devprodmed-course)"_
-enseigné à la
-[Haute Ecole d'Ingénierie et de Gestion du Canton de Vaud (HEIG-VD)](https://heig-vd.ch),
-Suisse.
+Projet réalisé dans le cadre du module Web & Mobile UI à la HEIG-VD.
 
-## Objectif du mini-projet
+L’application permet à une personne authentifiée de créer et gérer des sondages, puis de partager un lien public permettant à d’autres utilisateurs de voter et consulter les résultats.
 
-L'objectif de ce mini-projet est de créer un réseau social simple en utilisant le
-framework [Laravel](https://laravel.com/). Ce projet permettra de mettre en pratique les concepts
-appris dans le cours.
+## Fonctionnalités principales
+
+* Création, modification et suppression de sondages
+* Gestion des brouillons
+* Lancement d’un sondage
+* Choix simple ou multiple
+* Résultats publics ou privés
+* Durée de disponibilité d’un sondage
+* Génération d’un lien de partage avec token
+* Vote via lien public
+* Mise à jour des résultats en temps réel via polling
+* Aperçu graphique des résultats
+* Interface responsive (mobile first)
+
+## Technologies utilisées
+
+### Backend
+
+* Laravel 12
+* API JSON versionnée
+* SQLite
+
+### Frontend
+
+* Vue.js 3
+* Composition API
+* Fetch API
+* Vite
 
 ## Pré-requis
 
-Afin de lancer ce projet, une stack compatible avec Laravel, est requise.
+* PHP >= 8.0
+* Composer
+* Node.js et npm
+* SQLite (ou autre base compatible Laravel)
 
-Voici les pré-requis nécessaires :
+## Installation du projet
 
-- PHP >= 8.0.
-- Composer.
-- Node.js et npm.
-- Une base de données (MySQL, PostgreSQL, SQLite, etc.).
-- Un serveur web (Apache, Nginx, etc.).
+### 1. Cloner le dépôt
 
-[Laravel Herd](https://helm.sh/docs/charts/laravel/) est recommandé pour une installation facile de Laravel et de ses dépendances.
+```bash
+git clone <url-du-repo>
+```
 
-## Développement local
+### 2. Installer les dépendances
 
-Pour développer et tester le mini-projet en local, voici les étapes à suivre :
+```bash
+npm install
+composer install
+```
 
-1. Forker ce dépôt
+### 3. Configurer l’environnement
 
-2. Installer les dépendances avec npm et Composer :
+Copier le fichier `.env.example` :
 
-    ```bash
-    npm install && npm run build
+```bash
+cp .env.example .env
+```
 
-    composer install
-    ```
+Puis générer la clé Laravel :
 
-3. Copier le fichier `.env.example` en `.env`.
-4. Modifier les variables d'environnement si nécessaire (optionnel).
-5. Générer la clé d'application Laravel :
+```bash
+php artisan key:generate
+```
 
-    ```bash
-    php artisan key:generate
-    ```
+### 4. Créer le lien de stockage
 
-6. Créer le lien symbolique pour les fichiers téléversés :
+```bash
+php artisan storage:link
+```
 
-    ```bash
-    php artisan storage:link
-    ```
+### 5. Migrer la base de données
 
-7. Créer la base de données et exécuter les migrations :
+```bash
+php artisan migrate
+```
 
-    ```bash
-    php artisan migrate
-    ```
+### 6. Lancer le projet
 
-    S'il est nécessaire de réinitialiser la base de données, utiliser la commande `php artisan migrate:reset` puis `php artisan migrate` à nouveau.
+```bash
+composer run dev
+```
 
-8. Optionnel : en mode développement, il est possible de peupler la base de données avec des données fictives :
+Le projet sera accessible à l’adresse :
 
-    ```bash
-    php artisan db:seed
-    ```
+```txt
+http://127.0.0.1:8000
+```
 
-9. Démarrer le serveur de développement Laravel :
+## Routes principales
 
-    ```bash
-    composer run dev
-    ```
+### Dashboard
 
-L'application sera accessible à l'adresse <http://127.0.0.1:8000>.
+```txt
+/polls/dashboard
+```
+
+### Création d’un sondage
+
+```txt
+/polls/dashboard/create
+```
+
+### Page publique d’un sondage
+
+```txt
+/polls/{token}
+```
+
+## Architecture générale
+
+Le frontend Vue.js communique avec une API Laravel via des endpoints JSON.
+
+L’application utilise :
+
+* des composants Vue réutilisables ;
+* un store centralisé pour la gestion des sondages ;
+* du polling pour la mise à jour automatique des résultats ;
+* des tokens uniques pour le partage public des sondages.
+
+## Remarques
+
+* Un sondage lancé ne peut plus être modifié.
+* Les résultats privés sont uniquement visibles par le propriétaire du sondage.
+* Les votes sont limités à un vote par utilisateur pour les sondages à choix unique.
