@@ -16,6 +16,24 @@ export function usePollStore() {
     error.value = null;
   }
 
+  // CHANGEMENT :
+  // Fonction centralisée pour transformer les erreurs Laravel
+  // en messages plus compréhensibles pour l'utilisateur.
+  function getPollErrorMessage(err, fallbackMessage) {
+    const message = err?.data?.message;
+  
+    // CHANGEMENT :
+    // Message personnalisé pour les doublons d'options.
+    if (
+      message?.includes('valeur en double') ||
+      message?.includes('duplicate')
+    ) {
+      return 'Les options du sondage doivent être différentes.';
+    }
+  
+    return message || fallbackMessage;
+  }
+
   async function createPoll(payload) {
     loading.value = true;
     error.value = null;
@@ -31,7 +49,11 @@ export function usePollStore() {
 
       return result;
     } catch (err) {
-      error.value = 'Erreur avec le backend. Le sondage n’a pas pu être créé.';
+      error.value = getPollErrorMessage(
+        err,
+        'Erreur avec le backend. Le sondage n’a pas pu être créé.'
+      );
+
       return null;
     } finally {
       loading.value = false;
@@ -53,7 +75,11 @@ export function usePollStore() {
 
       return result;
     } catch (err) {
-      error.value = 'Erreur avec le backend. Le sondage n’a pas pu être modifié.';
+      error.value = getPollErrorMessage(
+        err,
+        'Erreur avec le backend. Le sondage n’a pas pu être modifié.'
+      );
+
       return null;
     } finally {
       loading.value = false;
@@ -72,7 +98,10 @@ export function usePollStore() {
 
       polls.value = polls.value.filter(p => p.id !== id);
     } catch (err) {
-      error.value = 'Erreur avec le backend. Le sondage n’a pas pu être supprimé.';
+      error.value = getPollErrorMessage(
+        err,
+        'Erreur avec le backend. Le sondage n’a pas pu être supprimé.'
+      );
     } finally {
       loading.value = false;
     }

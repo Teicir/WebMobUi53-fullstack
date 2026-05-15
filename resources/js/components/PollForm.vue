@@ -35,9 +35,13 @@
         ]
   );
 
-  const isDraft = ref(props.poll?.is_draft ?? true);
-  const allowMultipleChoices = ref(props.poll?.allow_multiple_choices ?? false);
-  const resultsPublic = ref(props.poll?.results_public ?? false);
+  // CHANGEMENT :
+  // En création, un nouveau sondage est lancé par défaut.
+  // En édition, on reprend explicitement la vraie valeur du sondage.
+  // Cela garantit qu'un brouillon reste coché quand on ouvre le formulaire de modification.
+  const isDraft = ref(props.poll ? Boolean(props.poll.is_draft) : false);
+  const allowMultipleChoices = ref(props.poll ? Boolean(props.poll.allow_multiple_choices) : false);
+  const resultsPublic = ref(props.poll ? Boolean(props.poll.results_public) : false);
   const duration = ref(props.poll?.duration || '');
 
   function addOption() {
@@ -81,8 +85,8 @@
 <template>
   <form class="poll-form" @submit.prevent="submitForm">
     <!-- CHANGEMENT :
-         Le titre change selon le mode du formulaire. -->
-    <h2>{{ isEditing ? 'Modifier le sondage' : 'Créer un sondage' }}</h2>
+         On enlève le titre interne "Créer/Modifier le sondage"
+         pour éviter la répétition avec la page et alléger le formulaire. -->
 
     <p v-if="error" class="error">{{ error }}</p>
 
@@ -111,7 +115,11 @@
           required
         >
 
+        <!-- CHANGEMENT :
+             Le bouton Retirer reçoit une classe dédiée
+             pour avoir un style plus clair et cohérent. -->
         <button
+          class="remove-button"
           type="button"
           @click="removeOption(index)"
           :disabled="options.length <= 2"
@@ -120,8 +128,11 @@
         </button>
       </div>
 
-      <button type="button" @click="addOption">
-        Ajouter une option
+      <!-- CHANGEMENT :
+           Le bouton "Ajouter une option" devient une action secondaire
+           plus visible et plus cohérente avec le reste de l'interface. -->
+      <button class="add-button" type="button" @click="addOption">
+        + Ajouter une option
       </button>
     </div>
 
@@ -142,15 +153,17 @@
       </label>
     </div>
 
+    <!-- CHANGEMENT :
+         La durée devient une liste déroulante pour éviter que l’utilisateur doive entrer des secondes. -->
     <div>
       <label for="duration">Durée de disponibilité</label>
-      <input
-        id="duration"
-        v-model="duration"
-        type="number"
-        min="1"
-        placeholder="Laisser vide pour aucune limite"
-      >
+
+      <select id="duration" v-model="duration">
+        <option value="">Aucune limite</option>
+        <option value="86400">1 jour</option>
+        <option value="259200">3 jours</option>
+        <option value="604800">7 jours</option>
+      </select>
     </div>
 
     <!-- CHANGEMENT :
@@ -190,16 +203,67 @@
   }
 
   input[type="text"],
-  input[type="number"] {
+  input[type="number"],
+  select {
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.65rem;
     border: 1px solid #ccc;
-    border-radius: 0.25rem;
+    border-radius: 0.35rem;
   }
 
+  /* CHANGEMENT :
+     Les options sont alignées proprement avec un espace plus régulier
+     entre le champ texte et le bouton Retirer. */
   .option-row {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  /* CHANGEMENT :
+     Le champ texte de l'option prend tout l'espace disponible. */
+  .option-row input {
+    flex: 1;
+  }
+
+  /* CHANGEMENT :
+     Style spécifique du bouton Retirer.
+     Le rouge indique une action destructive, mais reste moins agressif que le bouton Supprimer. */
+  .remove-button {
+    padding: 0.55rem 0.8rem;
+    color: #dc2626;
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: 0.4rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .remove-button:hover:not(:disabled) {
+    background-color: #fecaca;
+  }
+
+  .remove-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* CHANGEMENT :
+     Style spécifique du bouton Ajouter une option.
+     C'est une action secondaire, donc on utilise un contour bleu au lieu d'un bouton plein. */
+  .add-button {
+    margin-top: 0.25rem;
+    padding: 0.6rem 0.9rem;
+    color: #2563eb;
+    background-color: white;
+    border: 1px dashed #2563eb;
+    border-radius: 0.4rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .add-button:hover {
+    background-color: #eff6ff;
   }
 
   .settings label {
@@ -207,10 +271,7 @@
   }
 
   button {
-    padding: 0.5rem 0.75rem;
     border: none;
-    border-radius: 0.25rem;
-    cursor: pointer;
   }
 
   .error {
@@ -238,5 +299,34 @@
   .submit-button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+
+  /* CHANGEMENT :
+     Adaptation mobile du formulaire.
+     Sur téléphone, les options passent en colonne
+     et les boutons prennent toute la largeur pour être plus faciles à utiliser. */
+  @media (max-width: 700px) {
+    .poll-form {
+      margin: 0 1rem 2rem;
+      padding: 1rem;
+    }
+
+    .option-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+
+    .remove-button,
+    .add-button,
+    .submit-button {
+      width: 100%;
+    }
+
+    .settings {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
   }
 </style>
