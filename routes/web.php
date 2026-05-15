@@ -5,6 +5,7 @@ use App\Http\Controllers\LikeController;
 use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PollDashboardController;
+use App\Http\Controllers\PollShareController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TokenController;
 use App\Models\Post;
@@ -31,10 +32,19 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/auth/login', 'login');
 });
 
+
+
+
 Route::middleware('auth')->group(function () {
     Route::get('/polls/dashboard', [PollDashboardController::class, 'index'])->name('polls.dashboard');
     Route::get('/polls/dashboard/create', [PollDashboardController::class, 'create'])->name('polls.create');
     Route::get('/polls/dashboard/{id}/edit', [PollDashboardController::class, 'edit'])->name('polls.edit');
+
+    // CHANGEMENT :
+// Page publique d’un sondage accessible via son secret_token.
+// Cette route est hors du middleware auth pour permettre l’accès via un lien partagé.
+    Route::get('/polls/{token}', [PollShareController::class, 'show'])->name('polls.show');
+
     Route::resource('posts', PostController::class)->except(['index', 'show']);
     Route::singleton('my-profile', MyProfileController::class)->destroyable();
     Route::match(['put', 'patch'], '/likes/{post}', [LikeController::class, 'update']);
