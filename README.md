@@ -2,7 +2,9 @@
 
 Projet réalisé dans le cadre du module Web & Mobile UI à la HEIG-VD.
 
-L’application permet à une personne authentifiée de créer et gérer des sondages, puis de partager un lien public permettant à d’autres utilisateurs de voter et consulter les résultats.
+L’application permet à une personne authentifiée de créer et gérer des sondages, puis de partager un lien public permettant à d’autres utilisateurs authentifiés de voter et consulter les résultats.
+
+---
 
 ## Fonctionnalités principales
 
@@ -12,11 +14,13 @@ L’application permet à une personne authentifiée de créer et gérer des son
 * Choix simple ou multiple
 * Résultats publics ou privés
 * Durée de disponibilité d’un sondage
-* Génération d’un lien de partage avec token
+* Génération d’un lien de partage avec token unique
 * Vote via lien public
 * Mise à jour des résultats en temps réel via polling
 * Aperçu graphique des résultats
 * Interface responsive (mobile first)
+
+---
 
 ## Technologies utilisées
 
@@ -24,6 +28,7 @@ L’application permet à une personne authentifiée de créer et gérer des son
 
 * Laravel 12
 * API JSON versionnée
+* Laravel Sanctum
 * SQLite
 
 ### Frontend
@@ -33,12 +38,16 @@ L’application permet à une personne authentifiée de créer et gérer des son
 * Fetch API
 * Vite
 
+---
+
 ## Pré-requis
 
-* PHP >= 8.0
+* PHP >= 8.2
 * Composer
 * Node.js et npm
 * SQLite (ou autre base compatible Laravel)
+
+---
 
 ## Installation du projet
 
@@ -51,8 +60,8 @@ git clone <url-du-repo>
 ### 2. Installer les dépendances
 
 ```bash
-npm install
 composer install
+npm install
 ```
 
 ### 3. Configurer l’environnement
@@ -93,6 +102,8 @@ Le projet sera accessible à l’adresse :
 http://127.0.0.1:8000
 ```
 
+---
+
 ## Routes principales
 
 ### Dashboard
@@ -113,6 +124,8 @@ http://127.0.0.1:8000
 /polls/{token}
 ```
 
+---
+
 ## Architecture générale
 
 Le frontend Vue.js communique avec une API Laravel via des endpoints JSON.
@@ -122,10 +135,15 @@ L’application utilise :
 * des composants Vue réutilisables ;
 * un store centralisé pour la gestion des sondages ;
 * du polling pour la mise à jour automatique des résultats ;
-* des tokens uniques pour le partage public des sondages.
+* des tokens uniques pour le partage public des sondages ;
+* une séparation entre logique backend Laravel et interface frontend Vue.js.
+
+---
 
 ## Remarques
 
 * Un sondage lancé ne peut plus être modifié.
+* Les brouillons ne peuvent pas être votés.
 * Les résultats privés sont uniquement visibles par le propriétaire du sondage.
-* Les votes sont limités à un vote par utilisateur pour les sondages à choix unique.
+* Les votes sont limités à un vote par utilisateur.
+* Les résultats sont mis à jour automatiquement sans rechargement de page grâce au polling.
