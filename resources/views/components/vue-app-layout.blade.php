@@ -31,8 +31,10 @@
         <nav class="app-nav">
             <!-- CHANGEMENT :
                  On remplace le nom de l'application de base par "Sondages"
-                 pour que le header corresponde au projet actuel. -->
-            <a href="/" class="app-logo">
+                 pour que le header corresponde au projet actuel.
+                 Le lien renvoie maintenant vers le dashboard des sondages,
+                 et non vers l'accueil de l'ancien projet. -->
+            <a href="{{ route('polls.dashboard') }}" class="app-logo">
                 Sondages
             </a>
 

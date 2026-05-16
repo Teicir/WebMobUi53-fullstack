@@ -42,7 +42,17 @@
   const isDraft = ref(props.poll ? Boolean(props.poll.is_draft) : false);
   const allowMultipleChoices = ref(props.poll ? Boolean(props.poll.allow_multiple_choices) : false);
   const resultsPublic = ref(props.poll ? Boolean(props.poll.results_public) : false);
-  const duration = ref(props.poll?.duration || '');
+
+  // CHANGEMENT :
+  // La durée est maintenant saisie en jours dans l'interface.
+  // Comme le backend stocke encore la durée en secondes, on convertit :
+  // - en édition : secondes → jours pour préremplir le champ
+  // - à l'envoi : jours → secondes pour garder le backend compatible
+  const durationDays = ref(
+    props.poll?.duration
+      ? Math.round(Number(props.poll.duration) / 86400)
+      : ''
+  );
 
   function addOption() {
     options.value.push({ label: '' });
@@ -56,6 +66,13 @@
   async function submitForm() {
     clearError();
 
+    // CHANGEMENT :
+    // Conversion de la durée saisie en jours vers des secondes.
+    // Si le champ est vide, on envoie null pour garder "Aucune limite".
+    const durationInSeconds = durationDays.value
+      ? Number(durationDays.value) * 86400
+      : null;
+
     const payload = {
       title: title.value || null,
       question: question.value,
@@ -64,7 +81,7 @@
       allow_multiple_choices: allowMultipleChoices.value,
       allow_vote_change: false,
       results_public: resultsPublic.value,
-      duration: duration.value ? Number(duration.value) : null,
+      duration: durationInSeconds,
     };
 
     // CHANGEMENT :
@@ -154,16 +171,22 @@
     </div>
 
     <!-- CHANGEMENT :
-         La durée devient une liste déroulante pour éviter que l’utilisateur doive entrer des secondes. -->
+         La durée n'est plus une liste limitée.
+         L'utilisateur peut maintenant entrer un nombre de jours personnalisé. -->
     <div>
-      <label for="duration">Durée de disponibilité</label>
+      <label for="duration-days">Durée de disponibilité</label>
 
-      <select id="duration" v-model="duration">
-        <option value="">Aucune limite</option>
-        <option value="86400">1 jour</option>
-        <option value="259200">3 jours</option>
-        <option value="604800">7 jours</option>
-      </select>
+      <input
+        id="duration-days"
+        v-model="durationDays"
+        type="number"
+        min="1"
+        placeholder="Laisser vide pour aucune limite"
+      >
+
+      <p class="help-text">
+        Durée en jours. Exemple : 1, 3, 7, 14...
+      </p>
     </div>
 
     <!-- CHANGEMENT :
@@ -209,6 +232,15 @@
     padding: 0.65rem;
     border: 1px solid #ccc;
     border-radius: 0.35rem;
+  }
+
+  /* CHANGEMENT :
+     Texte d'aide ajouté sous le champ de durée
+     pour expliquer clairement que la valeur est en jours. */
+  .help-text {
+    margin: 0.35rem 0 0;
+    color: #64748b;
+    font-size: 0.9rem;
   }
 
   /* CHANGEMENT :
