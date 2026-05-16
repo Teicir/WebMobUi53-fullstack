@@ -35,7 +35,10 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect('/');
+        // CHANGEMENT :
+        // Après inscription, l'utilisateur est redirigé vers le dashboard
+        // des sondages au lieu de la page d'accueil générique.
+        return redirect('/polls/dashboard');
     }
 
     public function showLogin()
@@ -55,7 +58,10 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            return redirect()->intended('/');
+            // CHANGEMENT :
+            // Après connexion, l'utilisateur est redirigé vers le dashboard
+            // principal de l'application de sondages.
+            return redirect()->intended('/polls/dashboard');
         }
 
         return back()->withErrors([
