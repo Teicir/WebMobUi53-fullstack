@@ -44,6 +44,7 @@ class ApiPollController extends Controller
         $validated = $request->validate([
             'title' => ['nullable', 'string', 'max:255'],
             'question' => ['required', 'string', 'max:255'],
+            'options' => ['required', 'array', 'min:2'],
             'options.*.label' => ['required', 'string', 'max:255', 'distinct'],
             'is_draft' => ['boolean'],
             'allow_multiple_choices' => ['boolean'],
@@ -61,7 +62,12 @@ class ApiPollController extends Controller
             $poll->user_id = $request->user()->id;
             $poll->title = $validated['title'] ?? null;
             $poll->question = $validated['question'];
-            $poll->secret_token = Str::random(40);
+
+            // CHANGEMENT :
+            // Au lieu d'utiliser directement Str::random(40),
+            // on passe par une méthode qui vérifie que le token n'existe pas déjà.
+            $poll->secret_token = $this->generateUniqueSecretToken();
+
             $poll->is_draft = $isDraft;
             $poll->allow_multiple_choices = $validated['allow_multiple_choices'] ?? false;
             $poll->allow_vote_change = $validated['allow_vote_change'] ?? false;
@@ -189,5 +195,22 @@ class ApiPollController extends Controller
         $poll->delete();
 
         return response()->json(['message' => 'success'], 200);
+    }
+
+    /**
+     * CHANGEMENT :
+     * Génère un token secret unique pour le partage du sondage.
+     *
+     * Même si Str::random(40) a très peu de risques de collision,
+     * cette méthode vérifie explicitement que le token généré
+     * n'existe pas déjà en base de données.
+     */
+    private function generateUniqueSecretToken(): string
+    {
+        do {
+            $token = Str::random(40);
+        } while (Poll::where('secret_token', $token)->exists());
+
+        return $token;
     }
 }

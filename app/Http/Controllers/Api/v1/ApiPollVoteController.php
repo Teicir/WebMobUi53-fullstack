@@ -24,6 +24,16 @@ class ApiPollVoteController extends Controller
         }
 
         // CHANGEMENT :
+        // On bloque le vote si le sondage est encore en brouillon.
+        // Un sondage brouillon ne doit pas être accessible au vote,
+        // même si quelqu'un possède son lien avec token.
+        if ($poll->is_draft) {
+            return response()->json([
+                'message' => 'This poll is still a draft.',
+            ], 403);
+        }
+
+        // CHANGEMENT :
         // On bloque le vote si le sondage a une date de fin dépassée.
         if ($poll->ends_at && now()->greaterThan($poll->ends_at)) {
             return response()->json(['message' => 'This poll is closed.'], 403);
@@ -67,9 +77,10 @@ class ApiPollVoteController extends Controller
             ->get();
 
         // CHANGEMENT :
-        // Si un vote existe déjà et que le sondage n'autorise
-        // pas la modification des votes, on refuse le nouveau vote.
-        if ($existingVotes->isNotEmpty() && !$poll->allow_vote_change) {
+        // Pour respecter la consigne obligatoire,
+        // un utilisateur ne peut voter qu'une seule fois à un même sondage.
+        // La modification du vote est un bonus non implémenté ici.
+        if ($existingVotes->isNotEmpty()) {
             return response()->json([
                 'message' => 'You have already voted for this poll.',
             ], 403);
@@ -77,15 +88,8 @@ class ApiPollVoteController extends Controller
 
         DB::transaction(function () use ($request, $poll, $optionIds) {
             // CHANGEMENT :
-            // Si allow_vote_change est activé,
-            // on supprime les anciens votes avant d'enregistrer les nouveaux.
-            // Cela permet de remplacer le vote précédent.
-            PollVote::where('poll_id', $poll->id)
-                ->where('user_id', $request->user()->id)
-                ->delete();
-
-            // CHANGEMENT :
-            // On crée ensuite les nouveaux votes.
+            // Comme on a déjà vérifié qu'il n'existe pas de vote précédent,
+            // on peut directement créer le vote.
             foreach ($optionIds as $optionId) {
                 PollVote::create([
                     'poll_id' => $poll->id,
