@@ -16,7 +16,7 @@ L’application permet à une personne authentifiée de créer et gérer des son
 * Durée de disponibilité d’un sondage
 * Génération d’un lien de partage avec token unique
 * Vote via lien public
-* Mise à jour des résultats en temps réel via polling
+* Mise à jour des résultats en temps réel 
 * Aperçu graphique des résultats
 * Interface responsive (mobile first)
 
@@ -92,8 +92,16 @@ php artisan migrate
 
 ### 6. Lancer le projet
 
+Dans un premier terminal :
+
 ```bash
-composer run dev
+php artisan serve
+```
+
+Dans un second terminal :
+
+```bash
+npm run dev
 ```
 
 Le projet sera accessible à l’adresse :
@@ -134,7 +142,6 @@ L’application utilise :
 
 * des composants Vue réutilisables ;
 * un store centralisé pour la gestion des sondages ;
-* du polling pour la mise à jour automatique des résultats ;
 * des tokens uniques pour le partage public des sondages ;
 * une séparation entre logique backend Laravel et interface frontend Vue.js.
 
@@ -145,5 +152,4 @@ L’application utilise :
 * Un sondage lancé ne peut plus être modifié.
 * Les brouillons ne peuvent pas être votés.
 * Les résultats privés sont uniquement visibles par le propriétaire du sondage.
-* Les votes sont limités à un vote par utilisateur.
-* Les résultats sont mis à jour automatiquement sans rechargement de page grâce au polling.
+* Les votes sont limités à un vote par utilisateur et par sondage.
