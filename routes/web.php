@@ -32,18 +32,17 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/auth/login', 'login');
 });
 
-
-
+// CHANGEMENT :
+// Page publique d’un sondage accessible via son secret_token.
+// Cette route est hors du middleware auth pour permettre l’accès via un lien partagé.
+// Cela permet aussi à une personne non authentifiée de consulter les résultats
+// si les résultats du sondage sont publics.
+Route::get('/polls/{token}', [PollShareController::class, 'show'])->name('polls.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/polls/dashboard', [PollDashboardController::class, 'index'])->name('polls.dashboard');
     Route::get('/polls/dashboard/create', [PollDashboardController::class, 'create'])->name('polls.create');
     Route::get('/polls/dashboard/{id}/edit', [PollDashboardController::class, 'edit'])->name('polls.edit');
-
-    // CHANGEMENT :
-// Page publique d’un sondage accessible via son secret_token.
-// Cette route est hors du middleware auth pour permettre l’accès via un lien partagé.
-    Route::get('/polls/{token}', [PollShareController::class, 'show'])->name('polls.show');
 
     Route::resource('posts', PostController::class)->except(['index', 'show']);
     Route::singleton('my-profile', MyProfileController::class)->destroyable();
